@@ -1,0 +1,27 @@
+
+# All files
+[*]
+indent_style = space
+
+# Xml files
+
+# CA2227: Collection properties should be read only
+dotnet_diagnostic.CA2227.severity = none
+dotnet_diagnostic.CA1051.severity = none
+dotnet_diagnostic.CA1000.severity = none
+
+
+# IDE0022: Use block body for method
+dotnet_diagnostic.IDE0022.severity = suggestion
+
+# CA1305: Specify IFormatProvider
+dotnet_diagnostic.CA1305.severity = suggestion
+
+# CA1010: Generic interface should also be implemented
+dotnet_diagnostic.CA1010.severity = none
+
+# CA1710: Identifiers should have correct suffix
+dotnet_diagnostic.CA1710.severity = none
+
+[*.xml]
+indent_size = 2
