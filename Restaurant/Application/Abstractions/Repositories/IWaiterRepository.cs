@@ -7,7 +7,7 @@ namespace Application.Abstractions.Repositories;
 
 public interface IWaiterRepository
 {
-    Task<IList<Waiter>> GetAllWaitersAsync(bool IsRoomResponsable);
+    Task<IList<Waiter>> GetAllWaitersAsync(bool? IsRoomResponsible);
     Task<PagedResult<Waiter>> SearchByFilterAsync(GetWaitersByFilterQuery waiterFilter, CancellationToken cancellationToken = default);
     Task<Waiter?> SearchByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<int> CreateAsync(Waiter waiter);

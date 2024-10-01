@@ -35,14 +35,9 @@ internal sealed class GetWaitersByFilterQueryHandler : IPagedQueryHandler<GetWai
                     r.FirstName,
                     r.LastName,
                     r.Salary,
-                    r.ShiftId,
-                    new Shifts.Queries.ShiftResponse
-                    {
-                      Id = r.Shift.Id,
-                      Name = r.Shift.Name,
-                      Begin = r.Shift.StartTime,
-                      End = r.Shift.EndTime
-                    }
+                    r.Start,
+                    r.End,
+                    r.Room?.Name
                 )).ToList()
             };
             return paged;

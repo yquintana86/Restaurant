@@ -1,10 +1,9 @@
 ﻿using Application.Abstractions.Repositories;
 using Application.Waiters.Commands.DeleteWaiter;
-using Application.Waiters.Commands.UpdateWaiter;
 using Domain.Entities;
-using Domain.Exceptions;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using SharedLib.Models.Common;
 
 namespace Application.UnitTests.Waiters.Commands;
@@ -25,8 +24,8 @@ public class DeleteWaiterCommandTests
     public async Task Handle_Should_ReturnError_WhenWaiterNotFoundById()
     {
         //Arrange
-        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.Id))
-                                                        .Returns((Waiter?)null);
+        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.Id)).ReturnsNull();
+
         //Act
         var result = await _handler.Handle(_command, default);
 
@@ -63,7 +62,7 @@ public class DeleteWaiterCommandTests
 
         //Assert
         result.IsSuccess.Should().BeTrue();
-        result.Errors.Should().BeNull();
+        result.Errors.Should().BeNullOrEmpty();
     }
 
 

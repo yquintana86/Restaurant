@@ -22,7 +22,7 @@ public class PagedResult<T> : PagedResult
     {
         PageSize = 25;
         Currentpage = 1;
-        _results = null;
+        _results = new List<T>();
         _error = null;
     }
 

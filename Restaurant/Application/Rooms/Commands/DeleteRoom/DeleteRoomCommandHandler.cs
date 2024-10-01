@@ -3,6 +3,7 @@ using Application.Abstractions.Messaging;
 using Application.Abstractions.Repositories;
 using Domain.Exceptions;
 using Microsoft.Extensions.Logging;
+using SharedLib;
 using SharedLib.Models.Common;
 
 namespace Application.Rooms.Commands.DeleteRoom;
@@ -18,15 +19,18 @@ internal sealed class DeleteRoomCommandHandler : ICommandHandler<DeleteRoomComma
         _logger = logger;
     }
 
-    public async Task<ApiOperationResult> Handle(DeleteRoomCommand request, CancellationToken cancellationToken)
+    public async Task<ApiOperationResult> Handle(DeleteRoomCommand command, CancellationToken cancellationToken)
     {
         try
         {
-            var roomExist = await _roomRepository.ExistIdAsync(request.id,cancellationToken);
-            if (!roomExist)
-                return ApiOperationResult.Fail(RoomError.InvalidId(request.id));
+            var room = await _roomRepository.SearchByIdAsync(command.id,cancellationToken);
+            if (room is null)
+                return ApiOperationResult.Fail(RoomError.InvalidId(command.id));
 
-            await _roomRepository.DeleteAsync(request.id);
+            if (room.Tables is not null && room.Tables.Any())
+                return ApiOperationResult.Fail(RoomError.RoomWithTables(room.Name));
+
+            await _roomRepository.DeleteAsync(command.id);
 
             return ApiOperationResult.Success();
         }

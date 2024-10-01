@@ -1,10 +1,10 @@
 ﻿using Application.Abstractions.Repositories;
 using Application.Rooms.Commands.DeleteRoom;
-using Azure.Core;
 using Domain.Entities;
-using Domain.Exceptions;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
+using SharedLib.Models.Common;
 
 namespace Application.UnitTests.Rooms.Commands;
 
@@ -24,21 +24,38 @@ public sealed class DeleteRoomCommandTests
     public async Task Handle_Should_ReturnError_WhenRoomNotFoundedById()
     {
         //Arrange
-        _roomRepositoryMock.ExistIdAsync(Arg.Is<int>(s => s == _command.id)).Returns(false);
+        _roomRepositoryMock.SearchByIdAsync(_command.id, default).ReturnsNull();
 
         //Act
         var result = await _handler.Handle(_command,default);
 
         //Assert
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.Message == RoomError.InvalidId(_command.id).Message);
+        result.Errors.Should().Contain(e => e.ErrorType == ApiErrorType.Validation);
+    }
+
+    [Fact]
+    public async Task Handle_Should_ReturnError_WhenRoomStillHasTables()
+    {
+        //Arrange
+        _roomRepositoryMock.SearchByIdAsync(_command.id, default)
+            .Returns(new Room { Tables = new List<Domain.Entities.RoomTable>() 
+                                                    { new Domain.Entities.RoomTable()} });
+
+        //Act
+        var result = await _handler.Handle(_command, default);
+
+        //Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.ErrorType == ApiErrorType.Validation);
     }
 
     [Fact]
     public async Task Handle_Should_ReturnSuccess_WhenRoomFoundedById()
     {
         //Arrange
-        _roomRepositoryMock.ExistIdAsync(Arg.Is<int>(s => s == _command.id)).Returns(true);
+        _roomRepositoryMock.ExistIdAsync(_command.id).Returns(true);
+        _roomRepositoryMock.SearchByIdAsync(_command.id, default).Returns(new Room());
 
         //Act
         var result = await _handler.Handle(_command,default);
@@ -46,7 +63,7 @@ public sealed class DeleteRoomCommandTests
         //Assert
 
         result.IsSuccess.Should().BeTrue();
-        result.Errors.Should().BeNull();
+        result.Errors.Should().BeNullOrEmpty();
     }
 
 

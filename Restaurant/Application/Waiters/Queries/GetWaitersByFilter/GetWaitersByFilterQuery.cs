@@ -9,7 +9,7 @@ public sealed class GetWaitersByFilterQuery : PagingFilter, IPagedQuery<WaiterRe
     public string? LastName { get; set; }
     public decimal? SalaryFrom { get; set; }
     public decimal? SalaryTo { get; set; }
-    public int? ShiftId { get; set; }
-    
+    public DateTime? DateFrom { get; set; }
+    public DateTime? DateTo { get; set; }
 }
 

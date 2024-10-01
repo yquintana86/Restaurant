@@ -1,13 +1,10 @@
 ﻿using Application.Abstractions.Repositories;
-using Application.Shifts.Queries.GetShiftById;
 using Application.Waiters.Queries.GetWaiterById;
-using Azure.Core;
 using Domain.Entities;
-using Domain.Exceptions;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using SharedLib.Models.Common;
-using System.Threading;
 
 namespace Application.UnitTests.Waiters.Queries;
 
@@ -40,7 +37,7 @@ public class GetWaiterByIdQueryTests
     public async Task Handle_Should_ReturnError_WhenWaiterNotFoundbyId()
     {
         //Arrange
-        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _query.Id)).Returns((Waiter?)null);
+        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _query.Id)).ReturnsNull();
 
         //Act
         var result = await _handler.Handle(_query, default);
@@ -51,7 +48,7 @@ public class GetWaiterByIdQueryTests
     }
 
     [Fact]
-    public async Task Handle_Should_ReturnSuccess_WhenShiftExistById()
+    public async Task Handle_Should_ReturnSuccess_WhenWaiterExistById()
     {
         //Arrange
         _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _query.Id)).Returns(new Waiter());
@@ -61,7 +58,7 @@ public class GetWaiterByIdQueryTests
 
         //Assert
         result.IsSuccess.Should().BeTrue();
-        result.Errors.Should().BeNull();
+        result.Errors.Should().BeNullOrEmpty();
     }
 
 

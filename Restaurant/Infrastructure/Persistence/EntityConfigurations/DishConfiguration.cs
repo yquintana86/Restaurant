@@ -20,6 +20,6 @@ public class DishConfiguration : IEntityTypeConfiguration<Dish>
         .WithMany(i => i.Dishes)
         .UsingEntity<DishIngredient>();
 
-        builder.Property(d => d.Begin).HasColumnType("DateTime");
+        builder.Property(d => d.FirstServed).HasColumnType("DateTime");
     }
 }

@@ -31,6 +31,17 @@ public class RoomRepository : IRoomRepository
         return room.Id;
     }
 
+    public async Task<IEnumerable<Room>> GetRoomsAsync(CancellationToken cancellationToken = default)
+    {
+        using var connection = _dapperDbContext.Connection();
+
+        var sql = """"Select Id, Name, Theme, Description, WaiterId From Rooms"""";
+
+        var result = await connection.QueryAsync<Room>(sql);
+        
+        return result;
+    }
+
     public async Task DeleteAsync(int id)
     {
         if (id <= 0)
@@ -38,7 +49,7 @@ public class RoomRepository : IRoomRepository
 
         var room = await SearchByIdAsync(id);
 
-        if (room == null)
+        if (room is null)
             ArgumentNullException.ThrowIfNull(nameof(room));
 
         _eFCoreDbContext.Remove(room!);
@@ -106,7 +117,10 @@ public class RoomRepository : IRoomRepository
             entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(2));
 
             return await _eFCoreDbContext.Rooms
-                                            .Include(r => r.Waiter)     
+                                            .Include(r => r.Waiter)
+                                            .Include(r => r.Tables)
+                                            .AsSplitQuery()
+                                            .AsNoTracking()
                                             .FirstOrDefaultAsync(r => r.Id == id);
         });
 

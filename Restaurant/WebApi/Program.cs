@@ -58,7 +58,7 @@ app.UseHttpsRedirection();
 app.UseExceptionHandler();
 
 //EndPoints Without Carter because of conflict with Microsoft.EntityFrameworkCore.Design 8.x -> Microsoft.CodeAnalysis.Common
-app.AddShiftEndPoints();
+app.AddRoomTableEndpoints();
 app.AddWaitersEndPoints();
 app.AddRoomEndPoints();
 

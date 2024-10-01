@@ -13,13 +13,17 @@ namespace Restaurant.Infrastructure.Configurations
             builder.HasMany(w => w.Reservations)                
              .WithOne(w => w.Waiter)
              .HasForeignKey(w => w.WaiterId)
-             .OnDelete(DeleteBehavior.ClientNoAction)
              .IsRequired()
              .OnDelete(DeleteBehavior.NoAction);
+
+            //Waiter - WorkHistory RelationShip
+            builder.HasMany(w => w.WorkHistories)
+                .WithOne(wh => wh.Waiter);
 
             builder.Property(w => w.FirstName).HasColumnType("nvarchar(50)");
             builder.Property(w => w.LastName).HasColumnType("nvarchar(150)");
             builder.Property(w => w.Salary).HasColumnType("decimal(7,2)");
+            builder.Property(w => w.Start).HasDefaultValue(DateTime.Now);
             builder.Ignore(w => w.GetFullName);
         }
     }

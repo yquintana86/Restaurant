@@ -10,7 +10,7 @@ public sealed class UpdateWaiterCommandValidation : AbstractValidator<UpdateWait
         RuleFor(w => w.FirstName).NotNull().NotEmpty().MinimumLength(3);
         RuleFor(w => w.LastName).NotNull().NotEmpty().MinimumLength(3);
         RuleFor(w => w.Salary).GreaterThan(1);
-        RuleFor(w => w.ShiftId).GreaterThan(0);
+        RuleFor(w => w.Start.Year).GreaterThanOrEqualTo(2020);
     }
 }
 

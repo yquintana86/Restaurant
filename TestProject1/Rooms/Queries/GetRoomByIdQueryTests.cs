@@ -3,6 +3,7 @@ using Application.Rooms.Queries.GetRoomById;
 using Domain.Entities;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using SharedLib.Models.Common;
 
 namespace Application.UnitTests.Rooms.Queries;
@@ -37,7 +38,7 @@ public class GetRoomByIdQueryTests
     public async Task Handle_Should_ReturnError_WhenRoomNotFound()
     {
         //Arrange
-        _roomRepository.SearchByIdAsync(Arg.Is<int>(id => id == _query.Id)).Returns((Room?)null);
+        _roomRepository.SearchByIdAsync(Arg.Is<int>(id => id == _query.Id)).ReturnsNull();
 
         //Act
         var result = await _handler.Handle(_query, default);
@@ -76,7 +77,7 @@ public class GetRoomByIdQueryTests
 
         //Assert
         result.IsSuccess.Should().BeTrue();
-        result.Errors.Should().BeNull();
+        result.Errors.Should().BeNullOrEmpty();
     }
 
 

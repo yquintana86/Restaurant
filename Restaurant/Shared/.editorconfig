@@ -23,5 +23,8 @@ dotnet_diagnostic.CA1010.severity = none
 # CA1710: Identifiers should have correct suffix
 dotnet_diagnostic.CA1710.severity = none
 
+# CA1700: Do not name enum values 'Reserved'
+dotnet_diagnostic.CA1700.severity = none
+
 [*.xml]
 indent_size = 2

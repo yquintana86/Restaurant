@@ -2,5 +2,5 @@
 
 namespace Application.Waiters.Commands.CreateWaiter;
 
-public sealed record CreateWaiterCommand(string FirstName, string LastName, decimal Salary, int ShiftId) : ICommand;
+public sealed record CreateWaiterCommand(string FirstName, string LastName, decimal Salary) : ICommand;
 

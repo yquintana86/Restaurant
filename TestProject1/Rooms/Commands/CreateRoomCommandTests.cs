@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Exceptions;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 
 namespace Application.UnitTests.Rooms.Commands;
 
@@ -43,7 +44,7 @@ public sealed class CreateRoomCommandTests
         //Arrange
         _roomRepositoryMock.ExistNameAsync(Arg.Is<string>(n => n == _command.Name)).Returns(false);
 
-        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId),default).Returns((Waiter?)null);
+        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId),default).ReturnsNull();
 
         //Act
         var result = await _handler.Handle(_command, default);
@@ -58,7 +59,7 @@ public sealed class CreateRoomCommandTests
     {
         //Arrange
         _roomRepositoryMock.ExistNameAsync(Arg.Is<string>(n => n == _command.Name)).Returns(false);
-        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId)).Returns<Waiter?>(new Waiter() { Room = new Room() { Id = 1 } });
+        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId)).Returns(new Waiter() { Room = new Room() { Id = 1 } });
 
         //Act
         var result = await _handler.Handle(_command, default);
@@ -80,7 +81,7 @@ public sealed class CreateRoomCommandTests
 
         //Assert
         result.IsSuccess.Should().BeTrue();
-        result.Errors.Should().BeNull();
+        result.Errors.Should().BeNullOrEmpty();
     }
 
 

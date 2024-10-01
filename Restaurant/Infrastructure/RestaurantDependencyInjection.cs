@@ -4,7 +4,6 @@ using Infrastructure.Persistence.DataContext;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Infrastructure;
 
@@ -23,7 +22,7 @@ public static class RestaurantDependencyInjection
             return new DapperDbContext(conectionString!);
         });
 
-        services.AddScoped<IShiftRepository, ShiftRepository>();
+        services.AddScoped<IRoomTableRepository, RoomTableRepository>();
         services.AddScoped<IWaiterRepository, WaiterRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
 

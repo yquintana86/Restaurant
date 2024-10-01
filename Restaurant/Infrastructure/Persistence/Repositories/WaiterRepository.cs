@@ -26,10 +26,12 @@ public sealed class WaiterRepository : IWaiterRepository
 
     public async Task<PagedResult<Waiter>> SearchByFilterAsync(GetWaitersByFilterQuery waiterFilter, CancellationToken cancellationToken = default)
     {
-        if (waiterFilter == null)
+        if (waiterFilter is null)
             ArgumentNullException.ThrowIfNull(nameof(waiterFilter));
 
-        var query = from w in _eFCoreDbContext.Waiters.Include(w => w.Shift).AsNoTracking()
+        var query = from w in _eFCoreDbContext.Waiters
+                    .Include(w => w.Room)            
+                    .AsNoTracking()
                     select w;
 
         var firstName = waiterFilter!.FirstName;
@@ -54,9 +56,14 @@ public sealed class WaiterRepository : IWaiterRepository
             query = query.Where(w => w.Salary <= waiterFilter.SalaryTo);
         }
 
-        if (waiterFilter.ShiftId.HasValue)
+        if (waiterFilter.DateFrom.HasValue)
         {
-            query = query.Where(w => w.ShiftId == waiterFilter.ShiftId);
+            query = query.Where(w => DateTime.Compare(w.Start,waiterFilter.DateFrom.Value) > 0);
+        }
+
+        if (waiterFilter.DateTo.HasValue)
+        {
+            query = query.Where(w => w.End != null && DateTime.Compare(w.End.Value, waiterFilter.DateTo.Value.AddDays(1)) < 0);
         }
 
         var result = await query.ToQuickPagedList(w => w.Id, waiterFilter.Page, waiterFilter.PageSize, waiterFilter.RequestCount, cancellationToken);
@@ -76,10 +83,8 @@ public sealed class WaiterRepository : IWaiterRepository
             entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(2));
 
             return await _eFCoreDbContext.Waiters
-                                            .Include(w => w.Shift)
                                             .Include(w => w.Room)
                                             .AsNoTracking()
-                                            .AsSplitQuery()
                                             .FirstOrDefaultAsync(w => w.Id == id);
 
         });
@@ -102,7 +107,7 @@ public sealed class WaiterRepository : IWaiterRepository
 
     public async Task<int> CreateAsync(Waiter waiter)
     {
-        _eFCoreDbContext.Waiters.Add(waiter!);
+        _eFCoreDbContext.Waiters.Add(waiter);
         await _eFCoreDbContext.SaveChangesAsync();
 
         return waiter!.Id;
@@ -116,10 +121,10 @@ public sealed class WaiterRepository : IWaiterRepository
         waiterResponse!.FirstName = waiter.FirstName;
         waiterResponse.LastName = waiter.LastName;
         waiterResponse.Salary = waiter.Salary;
-        waiterResponse.ShiftId = waiter.ShiftId;
+        waiterResponse.Start = waiter.Start;
 
-        _eFCoreDbContext.Waiters.Update(waiterResponse);    //SetValues doesn't update navigation properties, if you try it will give you an error
-                                                            //Then we need to take care when the Reservations and ShiftId will be updated. 
+        _eFCoreDbContext.Waiters.Update(waiterResponse);   
+                                                            
         await _eFCoreDbContext.SaveChangesAsync();
     }
 
@@ -133,12 +138,24 @@ public sealed class WaiterRepository : IWaiterRepository
         return waiter!.Id;
     }
 
-    public async Task<IList<Waiter>> GetAllWaitersAsync(bool IsRoomResponsable)
+    public async Task<IList<Waiter>> GetAllWaitersAsync(bool? IsRoomResponsible = default)
     {
         using var connection = _dapperDbContext.Connection();
 
-        var sql = IsRoomResponsable ? """SELECT w.Id, w.FirstName, w.LastName From Waiters w INNER JOIN Rooms r ON w.Id = r.WaiterId Order By w.Id """
-                                    : """SELECT Id, FirstName, LastName From Waiters""";
+        var sql = string.Empty;
+
+        switch (IsRoomResponsible)
+        {
+            case null:
+                sql = """SELECT Id, FirstName, LastName From Waiters""";
+                break;
+            case true:
+                sql = """SELECT w.Id, w.FirstName, w.LastName From Waiters w INNER JOIN Rooms r ON w.Id = r.WaiterId Order By w.Id """;
+                break;
+           case false:
+                sql = """SELECT w.Id, w.FirstName, w.LastName, r.Id From Waiters w LEFT JOIN Rooms r ON w.Id = r.WaiterId Where r.Id is Null Order By w.Id """;
+                break;
+        };
         
         var result = await connection.QueryAsync<Waiter>(sql);
 

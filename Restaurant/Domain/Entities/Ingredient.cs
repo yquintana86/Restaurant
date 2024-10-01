@@ -9,8 +9,8 @@ public class Ingredient
     public decimal Price { get; set; }
 
     #region Navigation Properties
-    public ICollection<Dish> Dishes { get; } = new List<Dish>();
-    public ICollection<DishIngredient> DishIngredient { get; } = new List<DishIngredient>();
+    public ICollection<Dish> Dishes { get; init; } = new List<Dish>();
+    public ICollection<DishIngredient> DishIngredient { get; init; } = new List<DishIngredient>();
 
     #endregion
 }

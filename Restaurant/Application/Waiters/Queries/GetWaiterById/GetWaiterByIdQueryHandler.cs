@@ -29,7 +29,8 @@ internal sealed class GetWaiterByIdQueryHandler : IQueryHandler<GetWaiterByIdQue
             if (waiter is null)
                 return ApiOperationResult.Fail<WaiterResponse>(WaiterError.NotFound(request.Id));
 
-            var waiterResponse = waiter.Adapt<WaiterResponse>();
+            var waiterResponse = new WaiterResponse( waiter.Id, waiter.FirstName, waiter.LastName,
+                                                     waiter.Salary, waiter.Start, waiter.End, waiter.Room?.Name);
 
             return ApiOperationResult.Success(waiterResponse);
 

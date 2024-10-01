@@ -12,33 +12,31 @@ internal sealed class UpdateWaiterCommandHandler : ICommandHandler<UpdateWaiterC
 {
 
     private readonly IWaiterRepository _waiterRepository;
-    private readonly IShiftRepository _shiftRepository;
     private readonly ILogger<UpdateWaiterCommandHandler> _logger;
 
-    public UpdateWaiterCommandHandler(IWaiterRepository waiterRepository, IShiftRepository shiftRepository, ILogger<UpdateWaiterCommandHandler> logger)
+    public UpdateWaiterCommandHandler(IWaiterRepository waiterRepository, ILogger<UpdateWaiterCommandHandler> logger)
     {
         _waiterRepository = waiterRepository;
         _logger = logger;
-        _shiftRepository = shiftRepository;
     }
 
     public async Task<ApiOperationResult> Handle(UpdateWaiterCommand command, CancellationToken cancellationToken)
     {
         try
         {
-            var shift = await _shiftRepository.SearchByIdAsync(command.ShiftId, cancellationToken);
-            if (shift == null)
-                return ApiOperationResult.Fail(WaiterError.RelatedShiftNotFound($"{command.FirstName} {command.LastName}"));
-
             var waiter = await _waiterRepository.SearchByIdAsync(command.Id,cancellationToken);
 
             if (waiter is null)
                 return ApiOperationResult.Fail(WaiterError.NotFound(command.Id));
 
-            waiter = command.Adapt<Waiter>();
+            waiter.FirstName = command.FirstName;
+            waiter.LastName = command.LastName;
+            waiter.Salary = command.Salary;
+            waiter.Start = command.Start;
+
             await _waiterRepository.UpdateAsync(waiter);
 
-            return ApiOperationResult.Success(waiter);
+            return ApiOperationResult.Success();
 
         }
         catch (Exception ex)

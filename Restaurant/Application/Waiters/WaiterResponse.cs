@@ -1,6 +1,4 @@
-﻿using Application.Shifts.Queries;
+﻿namespace Application.Waiters;
 
-namespace Application.Waiters;
-
-public sealed record WaiterResponse(int Id, string FirstName, string LastName, decimal Salary, int ShiftId, ShiftResponse Shift);
+public sealed record WaiterResponse(int Id, string FirstName, string LastName, decimal Salary, DateTime Start, DateTime? End, string? RoomName);
 

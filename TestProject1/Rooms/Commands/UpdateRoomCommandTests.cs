@@ -1,10 +1,10 @@
 ﻿using Application.Abstractions.Repositories;
 using Application.Rooms.Commands.UpdateRoom;
-using Azure.Core;
 using Domain.Entities;
 using Domain.Exceptions;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 
 namespace Application.UnitTests.Rooms.Commands;
 
@@ -27,7 +27,7 @@ public sealed class UpdateRoomCommandTests
     public async Task Handle_Should_ReturnError_WhenRoomNotFound()
     {
         //Arrange
-        _roomRepositoryMock.SearchByIdAsync(Arg.Is<int>(s => s == _command.Id)).Returns((Room?)null);
+        _roomRepositoryMock.SearchByIdAsync(Arg.Is<int>(s => s == _command.Id)).ReturnsNull();
 
         //Act
         var result = await _handler.Handle(_command, default);
@@ -42,7 +42,7 @@ public sealed class UpdateRoomCommandTests
     {
         //Arrange
         _roomRepositoryMock.SearchByIdAsync(Arg.Is<int>(s => s == _command.Id)).Returns(new Room());
-        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId)).Returns((Waiter?)null);
+        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId)).ReturnsNull();
 
         //Act
         var result = await _handler.Handle(_command, default);
@@ -57,7 +57,7 @@ public sealed class UpdateRoomCommandTests
     {
         //Arrange
         _roomRepositoryMock.SearchByIdAsync(Arg.Is<int>(s => s == _command.Id)).Returns(new Room());
-        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId)).Returns<Waiter?>(new Waiter() { Room = new Room() { Id = _command.Id + 1 } });
+        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId)).Returns(new Waiter() { Room = new Room() { Id = _command.Id + 1 } });
 
         //Act
         var result = await _handler.Handle(_command, default);
@@ -73,7 +73,7 @@ public sealed class UpdateRoomCommandTests
 
         //Arrange
         _roomRepositoryMock.SearchByIdAsync(Arg.Is<int>(s => s == _command.Id)).Returns(new Room());
-        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId)).Returns<Waiter?>(new Waiter() { Room = new Room() { Id = _command.Id } });
+        _waiterRepositoryMock.SearchByIdAsync(Arg.Is<int>(id => id == _command.WaiterId)).Returns(new Waiter() { Room = new Room() { Id = _command.Id } });
 
         //Act
         var result = await _handler.Handle(_command, default);
@@ -81,6 +81,6 @@ public sealed class UpdateRoomCommandTests
         //Assert
 
         result.IsSuccess.Should().BeTrue();
-        result.Errors.Should().BeNull();
+        result.Errors.Should().BeNullOrEmpty();
     }
 }

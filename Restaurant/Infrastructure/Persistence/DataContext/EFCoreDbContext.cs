@@ -21,15 +21,16 @@ namespace Infrastructure.Persistence.DataContext
         public DbSet<Client> Clients { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Waiter> Waiters { get; set; }
-        public DbSet<Shift> Shifts { get; set; }
+        public DbSet<WorkHistory> WorkHistory { get; set; }
         public DbSet<Room> Rooms { get; set; }
-        public DbSet<Table> Tables { get; set; }
+        public DbSet<RoomTable> RoomTables { get; set; }
         public DbSet<Dish> Dishes { get; set; }
         public DbSet<TableDish> TableDishes { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<DishIngredient> DishIngredient { get; set; }
         public DbSet<Dessert> Desserts { get; set; }
         public DbSet<MainCourse> MainCourses { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

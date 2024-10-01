@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions.Repositories;
-using Application.Shifts.Queries.GetShiftsByFilter;
 using Application.Waiters.Queries.GetWaitersByFilter;
 using Domain.Entities;
 using FluentAssertions;
@@ -21,7 +20,7 @@ public class GetWaitersByFilterQueryTests
     }
 
     [Fact]
-    public async Task Handler_Should_ReturnNullResultField_WhenShiftNotFoundByFilter()
+    public async Task Handler_Should_ReturnSuccess_WhenFilterCriteriaGetsPagedResult()
     {
         //Arrange
         _waiterRepositoryMock.SearchByFilterAsync(Arg.Is<GetWaitersByFilterQuery>(f => f.FirstName == getWaitersByFilterQuery.FirstName &&
@@ -34,7 +33,7 @@ public class GetWaitersByFilterQueryTests
 
         //Assert
         result.Error.Should().BeNull();
-        result.Results.Should().BeNull();
+        result.Results.Should().BeNullOrEmpty();
     }
 
 

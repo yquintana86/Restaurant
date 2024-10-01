@@ -15,7 +15,7 @@ public class Room
     public Waiter Waiter { get; set; } = null!;
 
     //Room-Table collection navigation of the relationship
-    public ICollection<Table>? Tables { get; } = new List<Table>();
+    public ICollection<RoomTable>? Tables { get; init; } = new List<RoomTable>();
 
     #endregion
 }

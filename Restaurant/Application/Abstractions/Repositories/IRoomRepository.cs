@@ -7,6 +7,7 @@ namespace Application.Abstractions.Repositories;
 public interface IRoomRepository
 {
     Task<Room?> SearchByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Room>> GetRoomsAsync(CancellationToken cancellationToken = default);
     Task<Room?> SearchByNameAsync(string name, CancellationToken cancellationToken = default);
     Task<bool> ExistNameAsync(string name, CancellationToken cancellationToken = default);
     Task<bool> ExistIdAsync(int id, CancellationToken cancellationToken = default);

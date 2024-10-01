@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Domain.Entities;
+﻿namespace Domain.Entities;
 
 public class Waiter
 {
@@ -8,6 +6,8 @@ public class Waiter
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public decimal Salary { get; set; }
+    public DateTime Start { get; set; }
+    public DateTime? End { get; set; }
 
     public string GetFullName { 
         get
@@ -22,15 +22,13 @@ public class Waiter
     public Room? Room { get; set; }
 
     //Waiter-Table collection reference navigation
-    public ICollection<Table> Tables { get; } = new List<Table>();
-
+    public ICollection<RoomTable> RoomTables { get; init; } = new List<RoomTable>();
 
     //Waiter - Reservation Collection reference relationship
-    public ICollection<Reservation> Reservations { get; } = new List<Reservation>();
+    public ICollection<Reservation> Reservations { get; init; } = new List<Reservation>();
 
-    //Waiter Shift FK and Reference Navigation
-    public int ShiftId { get; set; }
-    public Shift Shift { get; set; } = null!;
+    //Waiter Work History Collection Reference relationShip
+    public ICollection<WorkHistory> WorkHistories { get; init; } = new List<WorkHistory>();
 
     #endregion
 }

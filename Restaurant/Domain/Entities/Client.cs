@@ -9,5 +9,5 @@ public class Client
     public string? Mail { get; set; }       //A validation is required "Phone or mail must have a value";
     public string? Address { get; set; }
     //Reservation
-    public ICollection<Reservation> Reservations { get; } = new List<Reservation>();
+    public ICollection<Reservation> Reservations { get; init; } = new List<Reservation>();
 }

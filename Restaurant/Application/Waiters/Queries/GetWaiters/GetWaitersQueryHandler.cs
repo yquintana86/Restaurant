@@ -23,7 +23,7 @@ internal sealed class GetWaitersQueryHandler : IQueryHandler<GetWaitersQuery, Li
 
         try
         {
-            var result = await _waiterRepository.GetAllWaitersAsync(request.IsRoomResponsable);
+            var result = await _waiterRepository.GetAllWaitersAsync(request.IsRoomResponsible);
 
             var selectItems = result.Select(w => new SelectItem
             {

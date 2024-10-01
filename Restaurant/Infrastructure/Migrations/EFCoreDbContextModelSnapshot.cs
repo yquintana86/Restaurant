@@ -63,13 +63,13 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Begin")
-                        .HasColumnType("DateTime");
-
                     b.Property<string>("Dish_Discriminator")
                         .IsRequired()
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
+
+                    b.Property<DateTime?>("FirstServed")
+                        .HasColumnType("DateTime");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -139,13 +139,16 @@ namespace Infrastructure.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("DinersQty")
                         .HasColumnType("int");
 
-                    b.Property<int>("ShiftId")
+                    b.Property<DateTime?>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<int>("WaiterId")
@@ -154,8 +157,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("ShiftId");
 
                     b.HasIndex("WaiterId");
 
@@ -209,80 +210,16 @@ namespace Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Shift", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Shifts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1003,
-                            EndTime = new DateTime(2024, 1, 1, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "First",
-                            StartTime = new DateTime(2024, 1, 1, 8, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 1004,
-                            EndTime = new DateTime(2024, 1, 1, 12, 15, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Second",
-                            StartTime = new DateTime(2024, 1, 1, 10, 15, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 1005,
-                            EndTime = new DateTime(2024, 1, 1, 14, 30, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Third",
-                            StartTime = new DateTime(2024, 1, 1, 12, 30, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 1008,
-                            EndTime = new DateTime(2024, 1, 1, 16, 45, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Fourth",
-                            StartTime = new DateTime(2024, 1, 1, 14, 45, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 1009,
-                            EndTime = new DateTime(2024, 1, 1, 19, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Fifth",
-                            StartTime = new DateTime(2024, 1, 1, 17, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 1010,
-                            EndTime = new DateTime(2024, 1, 1, 21, 15, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Sixth",
-                            StartTime = new DateTime(2024, 1, 1, 19, 15, 0, 0, DateTimeKind.Unspecified)
-                        });
-                });
-
-            modelBuilder.Entity("Domain.Entities.Table", b =>
+            modelBuilder.Entity("Domain.Entities.RoomTable", b =>
                 {
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -300,7 +237,49 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("WaiterId");
 
-                    b.ToTable("Tables");
+                    b.ToTable("RoomTables");
+
+                    b.HasData(
+                        new
+                        {
+                            RoomId = 7,
+                            Id = 2,
+                            Status = "Reserved",
+                            TotalQty = 2,
+                            WaiterId = 8
+                        },
+                        new
+                        {
+                            RoomId = 7,
+                            Id = 3,
+                            Status = "Busy",
+                            TotalQty = 2,
+                            WaiterId = 12
+                        },
+                        new
+                        {
+                            RoomId = 8,
+                            Id = 4,
+                            Status = "Unreserved",
+                            TotalQty = 2,
+                            WaiterId = 8
+                        },
+                        new
+                        {
+                            RoomId = 8,
+                            Id = 5,
+                            Status = "Reserved",
+                            TotalQty = 4,
+                            WaiterId = 13
+                        },
+                        new
+                        {
+                            RoomId = 8,
+                            Id = 6,
+                            Status = "Unreserved",
+                            TotalQty = 6,
+                            WaiterId = 13
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.TableDish", b =>
@@ -308,32 +287,26 @@ namespace Infrastructure.Migrations
                     b.Property<int>("TableId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomId")
+                    b.Property<int>("TableRoomId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ShiftId")
+                    b.Property<int>("ReservationId")
                         .HasColumnType("int");
 
                     b.Property<int>("DishId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("date");
-
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(7,2)");
 
-                    b.Property<int>("OrderQty")
+                    b.Property<int>("OrderedQty")
                         .HasColumnType("int");
 
-                    b.Property<int>("TableRoomId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TableId", "RoomId", "ShiftId", "DishId", "Date");
+                    b.HasKey("TableId", "TableRoomId", "ReservationId", "DishId");
 
                     b.HasIndex("DishId");
 
-                    b.HasIndex("ShiftId");
+                    b.HasIndex("ReservationId");
 
                     b.HasIndex("TableRoomId", "TableId");
 
@@ -348,6 +321,9 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("End")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
@@ -359,12 +335,12 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(7,2)");
 
-                    b.Property<int>("ShiftId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("Start")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 10, 1, 17, 52, 35, 458, DateTimeKind.Local).AddTicks(8577));
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ShiftId");
 
                     b.ToTable("Waiters");
 
@@ -375,7 +351,7 @@ namespace Infrastructure.Migrations
                             FirstName = "John",
                             LastName = "Doe",
                             Salary = 3000.00m,
-                            ShiftId = 1003
+                            Start = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -383,7 +359,7 @@ namespace Infrastructure.Migrations
                             FirstName = "Jane",
                             LastName = "Doe",
                             Salary = 5000.00m,
-                            ShiftId = 1004
+                            Start = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -391,26 +367,50 @@ namespace Infrastructure.Migrations
                             FirstName = "Smith",
                             LastName = "Johnson",
                             Salary = 6000.00m,
-                            ShiftId = 1005
+                            Start = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
-            modelBuilder.Entity("Reservation_Table", b =>
+            modelBuilder.Entity("Domain.Entities.WorkHistory", b =>
                 {
-                    b.Property<int>("room_id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("table_id")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WaiterId")
                         .HasColumnType("int");
 
-                    b.Property<int>("reservation_id")
+                    b.HasKey("Id");
+
+                    b.HasIndex("WaiterId");
+
+                    b.ToTable("WorkHistory");
+                });
+
+            modelBuilder.Entity("ReservationRoomTable", b =>
+                {
+                    b.Property<int>("ReservationsId")
                         .HasColumnType("int");
 
-                    b.HasKey("room_id", "table_id", "reservation_id");
+                    b.Property<int>("TablesRoomId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("reservation_id");
+                    b.Property<int>("TablesId")
+                        .HasColumnType("int");
 
-                    b.ToTable("Reservation_Table");
+                    b.HasKey("ReservationsId", "TablesRoomId", "TablesId");
+
+                    b.HasIndex("TablesRoomId", "TablesId");
+
+                    b.ToTable("ReservationRoomTable");
                 });
 
             modelBuilder.Entity("Domain.Entities.Dessert", b =>
@@ -463,12 +463,6 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Shift", "Shift")
-                        .WithMany("Reservations")
-                        .HasForeignKey("ShiftId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Waiter", "Waiter")
                         .WithMany("Reservations")
                         .HasForeignKey("WaiterId")
@@ -476,8 +470,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
-
-                    b.Navigation("Shift");
 
                     b.Navigation("Waiter");
                 });
@@ -493,14 +485,14 @@ namespace Infrastructure.Migrations
                     b.Navigation("Waiter");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Table", b =>
+            modelBuilder.Entity("Domain.Entities.RoomTable", b =>
                 {
                     b.HasOne("Domain.Entities.Room", "Room")
                         .WithMany("Tables")
                         .HasForeignKey("RoomId");
 
                     b.HasOne("Domain.Entities.Waiter", "Waiter")
-                        .WithMany("Tables")
+                        .WithMany("RoomTables")
                         .HasForeignKey("WaiterId");
 
                     b.Navigation("Room");
@@ -516,13 +508,13 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Shift", "Shift")
-                        .WithMany("TableDishs")
-                        .HasForeignKey("ShiftId")
+                    b.HasOne("Domain.Entities.Reservation", "Reservation")
+                        .WithMany("TableDishes")
+                        .HasForeignKey("ReservationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Table", "Table")
+                    b.HasOne("Domain.Entities.RoomTable", "Table")
                         .WithMany("TablesDishes")
                         .HasForeignKey("TableRoomId", "TableId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -530,33 +522,33 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Dish");
 
-                    b.Navigation("Shift");
+                    b.Navigation("Reservation");
 
                     b.Navigation("Table");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Waiter", b =>
+            modelBuilder.Entity("Domain.Entities.WorkHistory", b =>
                 {
-                    b.HasOne("Domain.Entities.Shift", "Shift")
-                        .WithMany("Waiters")
-                        .HasForeignKey("ShiftId")
+                    b.HasOne("Domain.Entities.Waiter", "Waiter")
+                        .WithMany("WorkHistories")
+                        .HasForeignKey("WaiterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Shift");
+                    b.Navigation("Waiter");
                 });
 
-            modelBuilder.Entity("Reservation_Table", b =>
+            modelBuilder.Entity("ReservationRoomTable", b =>
                 {
                     b.HasOne("Domain.Entities.Reservation", null)
                         .WithMany()
-                        .HasForeignKey("reservation_id")
+                        .HasForeignKey("ReservationsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Table", null)
+                    b.HasOne("Domain.Entities.RoomTable", null)
                         .WithMany()
-                        .HasForeignKey("room_id", "table_id")
+                        .HasForeignKey("TablesRoomId", "TablesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -578,21 +570,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("DishIngredient");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Reservation", b =>
+                {
+                    b.Navigation("TableDishes");
+                });
+
             modelBuilder.Entity("Domain.Entities.Room", b =>
                 {
                     b.Navigation("Tables");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Shift", b =>
-                {
-                    b.Navigation("Reservations");
-
-                    b.Navigation("TableDishs");
-
-                    b.Navigation("Waiters");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Table", b =>
+            modelBuilder.Entity("Domain.Entities.RoomTable", b =>
                 {
                     b.Navigation("TablesDishes");
                 });
@@ -603,7 +591,9 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("Room");
 
-                    b.Navigation("Tables");
+                    b.Navigation("RoomTables");
+
+                    b.Navigation("WorkHistories");
                 });
 #pragma warning restore 612, 618
         }
